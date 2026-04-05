@@ -1,226 +1,108 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Satured Hub</title>
 
 <style>
-body{
-    margin:0;
-    background: radial-gradient(circle at top, #0f0f0f, #000);
-    color:#fff;
-    font-family:Arial;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+body {
+    margin: 0;
+    background: linear-gradient(135deg, #0a0a0a, #111);
+    color: white;
+    font-family: Arial;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-.container{
-    background:#111;
-    padding:40px;
-    border-radius:20px;
-    text-align:center;
-    box-shadow:0 0 30px rgba(0,255,255,0.2);
-    width:90%;
-    max-width:500px;
+/* Card */
+.container {
+    background: #111;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.8);
+    text-align: center;
+    width: 400px;
 }
 
-h1{
-    margin-bottom:20px;
-    color:#0ff;
-    text-shadow:0 0 10px #0ff;
+/* Input */
+input {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background: #000;
+    color: #0f0;
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
 }
 
-input{
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:10px;
-    text-align:center;
-    margin-bottom:15px;
-    background:#000;
-    color:#0f0;
-    font-size:14px;
+/* Button */
+button {
+    margin-top: 15px;
+    padding: 10px 25px;
+    background: #fff;
+    border: none;
+    cursor: pointer;
 }
 
-button{
-    padding:12px 25px;
-    border:none;
-    border-radius:10px;
-    background:#0ff;
-    color:#000;
-    cursor:pointer;
-    font-weight:bold;
-    transition:0.2s;
+button:hover {
+    background: #ddd;
 }
 
-button:hover{
-    background:#00cccc;
-}
-
-#timer{
-    margin-top:15px;
-    color:#aaa;
-}
-
-.hidden{
-    display:none;
+#error {
+    color: red;
+    font-size: 18px;
 }
 </style>
-</head>
 
+</head>
 <body>
 
-<div class="container">
-    <h1>Satured Hub</h1>
+<div class="container" id="app" style="display:none;">
+    <h2>Satured Hub Key</h2>
+    <input id="keyField" readonly>
+    <button onclick="copyKey()">Copy</button>
+</div>
 
-    <div id="loading">Verificando acceso...</div>
-
-    <div id="wait" class="hidden">
-        <p>Completa el acceso...</p>
-        <div id="countdown"></div>
-    </div>
-
-    <div id="app" class="hidden">
-        <input id="keyField" readonly>
-        <button onclick="copyKey()">Copiar Key</button>
-        <div id="timer"></div>
-    </div>
+<div id="error" style="display:none;">
+    YOU YOU GET KICK FOR USING BYPASS  
+    <br>  
+    JELIPOLLAS
 </div>
 
 <script>
-const DAY = 86400000;
-const WAIT_TIME = 10; // segundos obligatorios
 
-// 🔐 Referrer check
-const allowedReferrers = ["lootlabs.gg","linkvertise.com"];
-const ref = document.referrer;
+// ================= CHECK TOKEN =================
+const params = new URLSearchParams(location.search);
+const access = params.get("access");
 
-if(!allowedReferrers.some(site => ref.includes(site))){
-    document.getElementById("loading").innerText = "Acceso denegado";
-    throw "Blocked";
-}
+// 🔒 Si no tiene token → bloqueado
+if (!access || !access.startsWith("LINK_OK")) {
+    document.getElementById("error").style.display = "block";
+} else {
+    document.getElementById("app").style.display = "block";
 
-// 🔑 Generador
-function randomString(len){
-    const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let result="";
-    const arr=new Uint8Array(len);
-    crypto.getRandomValues(arr);
-    arr.forEach(x=>result+=chars[x%chars.length]);
-    return result;
-}
-
-function generateKey(){
-    return "satured-hub-key-" + randomString(32);
-}
-
-function generateID(){
-    return crypto.randomUUID().replace(/-/g,"").slice(0,16);
-}
-
-function getID(){
-    return new URLSearchParams(location.search).get("id");
-}
-
-let timeLeft = WAIT_TIME;
-let lostFocus = false;
-
-// 👁️ Anti cambio de pestaña
-document.addEventListener("visibilitychange", () => {
-    if(document.hidden){
-        lostFocus = true;
-    }
-});
-
-function startWait(){
-    document.getElementById("loading").style.display="none";
-    document.getElementById("wait").classList.remove("hidden");
-
-    const interval = setInterval(()=>{
-        if(lostFocus){
-            clearInterval(interval);
-            location.reload(); // reinicia si cambia pestaña
+    // ================= GENERATE KEY =================
+    function randomString(length) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let result = "";
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
         }
+        return result;
+    }
 
-        timeLeft--;
-        document.getElementById("countdown").innerText =
-            "Espera: " + timeLeft + "s";
-
-        if(timeLeft <= 0){
-            clearInterval(interval);
-            initApp();
-        }
-    },1000);
+    const key = "satured-hub-key-" + randomString(20);
+    document.getElementById("keyField").value = key;
 }
 
-function initApp(){
-    let id = getID();
-
-    if(!id){
-        const newID = generateID();
-        const key = generateKey();
-
-        localStorage.setItem("secure_"+newID, JSON.stringify({
-            key:key,
-            created:Date.now(),
-            ua:navigator.userAgent
-        }));
-
-        location.replace("?id="+newID);
-        return;
-    }
-
-    const stored = localStorage.getItem("secure_"+id);
-
-    if(!stored){
-        document.getElementById("loading").innerText="Error";
-        return;
-    }
-
-    const data = JSON.parse(stored);
-
-    if(data.ua !== navigator.userAgent){
-        document.getElementById("loading").innerText="Bloqueado";
-        localStorage.removeItem("secure_"+id);
-        return;
-    }
-
-    document.getElementById("wait").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
-
-    document.getElementById("keyField").value = data.key;
-
-    function updateTimer(){
-        const remaining = (data.created + DAY) - Date.now();
-
-        if(remaining <= 0){
-            document.getElementById("timer").innerText="Expirada";
-            return;
-        }
-
-        const h=Math.floor(remaining/3600000);
-        const m=Math.floor((remaining%3600000)/60000);
-        const s=Math.floor((remaining%60000)/1000);
-
-        document.getElementById("timer").innerText =
-            "Reset en: "+h+"h "+m+"m "+s+"s";
-    }
-
-    setInterval(updateTimer,1000);
-    updateTimer();
+// ================= COPY =================
+function copyKey() {
+    navigator.clipboard.writeText(document.getElementById("keyField").value);
 }
-
-function copyKey(){
-    navigator.clipboard.writeText(
-        document.getElementById("keyField").value
-    );
-}
-
-// 🚀 iniciar
-startWait();
 
 </script>
 
