@@ -170,8 +170,9 @@ function initApp(){
             ua:navigator.userAgent
         }));
 
-        location.replace("?id="+newID);
-        return;
+        // FIX: Update URL without reloading the page to prevent the double timer bug
+        history.replaceState(null, "", "?id="+newID);
+        id = newID; // Assign the new ID to continue execution immediately
     }
 
     const stored = localStorage.getItem("secure_"+id);
