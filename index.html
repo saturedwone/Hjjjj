@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -76,23 +76,23 @@ button:hover{
 <div class="container">
     <h1>Satured Hub</h1>
 
-    <div id="loading">Verificando acceso...</div>
+    <div id="loading">Verifying access...</div>
 
     <div id="wait" class="hidden">
-        <p>Completa el acceso...</p>
+        <p>Complete access...</p>
         <div id="countdown"></div>
     </div>
 
     <div id="app" class="hidden">
         <input id="keyField" readonly>
-        <button onclick="copyKey()">Copiar Key</button>
+        <button onclick="copyKey()">Copy Key</button>
         <div id="timer"></div>
     </div>
 </div>
 
 <script>
 const DAY = 86400000;
-const WAIT_TIME = 10; // segundos obligatorios
+const WAIT_TIME = 10; // mandatory seconds
 
 // 🔐 Referrer check
 const allowedReferrers = ["lootlabs.gg","linkvertise.com"];
@@ -100,11 +100,11 @@ const ref = document.referrer;
 const hasID = new URLSearchParams(location.search).get("id");
 
 if(!hasID && !allowedReferrers.some(site => ref.includes(site))){
-    document.getElementById("loading").innerText = "You got kicked for using bypass, and also dumbass!";
+    document.getElementById("loading").innerText = "You got kicked for using bypass!";
     throw "Blocked";
 }
 
-// 🔑 Generador
+// 🔑 Generator
 function randomString(len){
     const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let result="";
@@ -129,7 +129,7 @@ function getID(){
 let timeLeft = WAIT_TIME;
 let lostFocus = false;
 
-// 👁️ Anti cambio de pestaña
+// 👁️ Anti tab switch
 document.addEventListener("visibilitychange", () => {
     if(document.hidden){
         lostFocus = true;
@@ -143,12 +143,12 @@ function startWait(){
     const interval = setInterval(()=>{
         if(lostFocus){
             clearInterval(interval);
-            location.reload(); // reinicia si cambia pestaña
+            location.reload(); // restarts if tab changes
         }
 
         timeLeft--;
         document.getElementById("countdown").innerText =
-            "Espera: " + timeLeft + "s";
+            "Wait: " + timeLeft + "s";
 
         if(timeLeft <= 0){
             clearInterval(interval);
@@ -184,7 +184,7 @@ function initApp(){
     const data = JSON.parse(stored);
 
     if(data.ua !== navigator.userAgent){
-        document.getElementById("loading").innerText="Bloqueado";
+        document.getElementById("loading").innerText="Blocked";
         localStorage.removeItem("secure_"+id);
         return;
     }
@@ -198,7 +198,7 @@ function initApp(){
         const remaining = (data.created + DAY) - Date.now();
 
         if(remaining <= 0){
-            document.getElementById("timer").innerText="Expirada";
+            document.getElementById("timer").innerText="Expired";
             return;
         }
 
@@ -207,7 +207,7 @@ function initApp(){
         const s=Math.floor((remaining%60000)/1000);
 
         document.getElementById("timer").innerText =
-            "Reset en: "+h+"h "+m+"m "+s+"s";
+            "Reset in: "+h+"h "+m+"m "+s+"s";
     }
 
     setInterval(updateTimer,1000);
@@ -220,7 +220,7 @@ function copyKey(){
     );
 }
 
-// 🚀 iniciar
+// 🚀 start
 startWait();
 
 </script>
